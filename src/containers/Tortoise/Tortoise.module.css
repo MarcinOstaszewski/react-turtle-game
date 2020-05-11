@@ -1,0 +1,67 @@
+#Tortoise {
+    position: fixed;
+    transition: all 1s, left 0s, top 0s, transform 0s;
+    background-color: green;
+    border: 2px solid rgb(9, 90, 9);
+    border-radius: 18px;
+    width: 32px;
+    height: 40px;
+}
+
+#Tortoise div, 
+#Tortoise div::before {
+    transition: all 1s, transform-origin 0s;
+    position: absolute;
+}
+.head {
+    left: 50%;
+    top: -10px;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    border-radius: 8px;
+    background-color: rgb(119, 177, 32);
+    border-bottom: 5px solid green;
+}
+.head::before {
+    content: '';
+    top: 7px;
+    left: 2px;
+    width: 8px;
+    height: 3px;
+    background-color: rgb(119, 177, 32);
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+}
+.flap {
+    transform-origin: top left;
+    top: 8px;
+    right: -2px;
+    width: 6px;
+    height: 22px;
+    background-color: rgb(54, 141, 28);
+    border-bottom: 2px solid rgb(29, 83, 12);
+    transform: rotate(-80deg);
+    border-radius: 4px;
+}
+.flap.left {
+    transform-origin: top right;
+    left: -2px;
+    transform: rotate(80deg);
+}
+.rear {
+    right: -3px;
+    bottom: -6px;
+    width: 6px;
+    height: 14px;
+    border-radius: 5px;
+    transform: rotate(20deg);
+    background-color: rgb(54, 141, 28);
+    border-bottom: 3px solid rgb(31, 82, 16);
+    transform-origin: top left;
+}
+.rear.left {
+    left: -3px;
+    transform: rotate(-20deg);
+    transform-origin: top right;
+}
