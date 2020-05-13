@@ -45,8 +45,8 @@ class Tortoise extends Component {
             } else return {}
         } else if (flap.moving === 30) { // flap starts to return
             return {
-                                transform: 'rotate(' + (flap.sign ? '-' : '') + '80deg)',
-                                // transform: null,
+                        transform: 'rotate(' + (flap.sign ? '-' : '') + '80deg)',
+                        // transform: null,
                 moving: --flap.moving,
                 speed: 0
             }
@@ -54,7 +54,6 @@ class Tortoise extends Component {
             return {
                 moving: --flap.moving,
                 speed: (flap.moving > 55)  ?  flap.speed * 1.15  :  flap.speed * 0.97,
-                rotationVelocity: (flap.moving > 30) ? this.state.rotationVelocity + flap.speed : this.state.rotationVelocity
             }
         }
     }
@@ -71,15 +70,15 @@ class Tortoise extends Component {
         } else {
             values.horizontalVelocity = 0;
         }
-        if (values.rotation > this.maxRotation) { 
-            values.rotation = this.maxRotation; // rotation cannot exceed max...
-        } else if (values.rotation < -this.maxRotation) { 
-            values.rotation = -this.maxRotation; // ... nor -max
+        if (values.rotationVelocity > this.maxRotation) { 
+            values.rotationVelocity = this.maxRotation; // rotation cannot exceed max...
+        } else if (values.rotationVelocity < -this.maxRotation) { 
+            values.rotationVelocity = -this.maxRotation; // ... nor -max
         } else {
-            if (Math.abs(values.rotation) > 0.1) {
-                values.rotation = values.rotation * 0.97; // slowing down rotation
+            if (Math.abs(values.rotationVelocity) > 0.1) {
+                values.rotationVelocity *= 0.97; // slowing down rotation
             } else {
-                values.rotation = 0;
+                values.rotationVelocity = 0;
             }
         }
         return {
@@ -125,6 +124,7 @@ class Tortoise extends Component {
             top: Number(this.state.top.slice(0, -2)),
             left: Number(this.state.left.slice(0, -2)),
             rotation: this.state.rotation + 0,
+            rotationVelocity: this.state.rotationVelocity,
             head: '-10px',
         }
         
@@ -133,29 +133,33 @@ class Tortoise extends Component {
         Object.assign(tempVal.leftFlap, this.flapsMoving(tempVal.leftFlap)) // naspisuje w tempVal zmienne dla płetw
         Object.assign(tempVal.rightFlap, this.flapsMoving(tempVal.rightFlap))
         
+        tempVal.rotation = tempVal.rotation + tempVal.leftFlap.speed - tempVal.rightFlap.speed;
+
         tempVal.horizontalVelocity = this.state.horizontalVelocity - (this.maxVelocity * (tempVal.leftFlap.speed + tempVal.rightFlap.speed) / 4) * Math.cos(this.state.rotation * Math.PI / 180);
         tempVal.verticalVelocity = this.state.verticalVelocity + (this.maxVelocity * (tempVal.leftFlap.speed + tempVal.rightFlap.speed) / 4) * Math.sin(this.state.rotation * Math.PI / 180);
         
         if (this.props.keysPressed['s']) {
             tempVal.rearRightTransform = "rotate(-40deg)";
             tempVal.rearLeftTransform = "rotate(40deg)";
-            tempVal.horizontalVelocity = 0.96 * this.state.horizontalVelocity;
-            tempVal.verticalVelocity = 0.96 * this.state.verticalVelocity;
+            tempVal.horizontalVelocity = 0.97 * tempVal.horizontalVelocity;
+            tempVal.verticalVelocity = 0.97 * tempVal.verticalVelocity;
         }
         Object.assign(tempVal, this.calculateVelocityAndRotation(tempVal));
 
-                    // add collision detection here
+        // this.checkCollisions(tempVal.left, tempVal.top);
 
         Object.assign(tempVal, this.verifyBounce(tempVal.left, tempVal.top, tempVal.horizontalVelocity, tempVal.verticalVelocity));
         Object.assign(tempVal, this.setPlayerPosition(tempVal.left, tempVal.top, tempVal.horizontalVelocity, tempVal.verticalVelocity));
         Object.assign(tempVal, this.setPlayerRotation(tempVal.rotation));
         
-        console.log(tempVal.rotation)
         this.setState({...tempVal})
     }
 
     componentDidMount() {
         this.interval = window.setInterval(this.moveTortoise, this.frameLength);
+    }
+    componentWillUnmount() {
+        window.clearInterval(this.interval);
     }
 
     render() { 
