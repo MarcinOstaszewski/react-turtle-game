@@ -8,8 +8,6 @@ class App extends Component {
   state = {
     windowInnerWidth: window.innerWidth,
     windowInnerHeight: window.innerHeight,
-    left: '600px',
-    top: '400px',
     rotation: 0,
     keysPressed: {},
     tortoise: {
@@ -39,7 +37,6 @@ class App extends Component {
       }
       this.setState({ keysPressed: keys })
     }
-    window.onresize = () => this.checkWindowSize();
     this.checkWindowSize();
   }
 
@@ -52,11 +49,10 @@ class App extends Component {
         />
         <Tortoise scrWidth={this.state.windowInnerWidth}
           scrHeight={this.state.windowInnerHeight}
-          left={this.state.left}
-          top={this.state.top}
           rotation={this.state.rotation}
           keysPressed={this.state.keysPressed}
           frameLength={this.frameLength}
+          checkWindowSize={this.checkWindowSize}
         />
       </div>
   );

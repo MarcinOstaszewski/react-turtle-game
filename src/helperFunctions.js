@@ -36,44 +36,39 @@ let checkCollisions = (s1, x1, y1, star) => {
 
 let placeStar = (i, that) => {
     let tortoise = that;
-    let x = Math.floor(Math.random() * (tortoise.state.scrWidth - 60) + 30);
-    let y = Math.floor(Math.random() * (tortoise.state.scrHeight - 60) + 30);
+    let x = Math.floor(Math.random() * (tortoise.props.scrWidth - 60) + 30);
+    let y = Math.floor(Math.random() * (tortoise.props.scrHeight - 60) + 30);
     tortoise.setState(state => {
-        const stars = state.starsArr.map((item, j) => {
-            if (j === i) {
-                return {
-                    ...item,
-                    hSpeed: Math.random() * 4 - 2,
-                    vSpeed: Math.random() * 4 - 2,
-                    left: x + 'px',
-                    top: y + 'px'
-                };
-            } else {
-                return item;
-            };
-        })
-
-        return { starsArr: stars }
+        let stars = state.starsArr.map(item => item);
+        stars[i] = {
+            size: 20,
+            hSpeed: Math.random() * 4 - 2,
+            vSpeed: Math.random() * 4 - 2,
+            left: x + 'px',
+            top: y + 'px'
+        };
+        return {starsArr: stars};
     })
-    tortoise.starInterval = window.setInterval(moveStar.bind(null, i, tortoise), tortoise.props.frameLength);
+    ++tortoise.starsCount;
+    tortoise.starInterval[i] = window.setInterval(moveStar.bind(null, i, tortoise), tortoise.props.frameLength);
 }
 
 let moveStar = (i, that) => {
     let tortoise = that
-    let left = Number(tortoise.state.starsArr[i].left.slice(0, -2));
-    let top = Number(tortoise.state.starsArr[i].top.slice(0, -2));
+    let left = parseFloat(tortoise.state.starsArr[i].left);
+    let top = parseFloat(tortoise.state.starsArr[i].top);
     let hSpeed = tortoise.state.starsArr[i].hSpeed;
     let vSpeed = tortoise.state.starsArr[i].vSpeed;
     if (left + tortoise.state.starsArr[i].hSpeed <= 0) {
         hSpeed = 0 - tortoise.state.starsArr[i].hSpeed;
     }
-    if (left + tortoise.state.starsArr[i].hSpeed > tortoise.state.scrWidth - tortoise.state.starsArr[i].size) {
+    if (left + tortoise.state.starsArr[i].hSpeed > tortoise.props.scrWidth - tortoise.state.starsArr[i].size) {
         hSpeed = 0 - tortoise.state.starsArr[i].hSpeed;
     }
     if (top + tortoise.state.starsArr[i].vSpeed < 0) {
         vSpeed = 0 - tortoise.state.starsArr[i].vSpeed;
     }
-    if (top + tortoise.state.starsArr[i].vSpeed > tortoise.state.scrHeight - tortoise.state.starsArr[i].size) {
+    if (top + tortoise.state.starsArr[i].vSpeed > tortoise.props.scrHeight - tortoise.state.starsArr[i].size) {
         vSpeed = 0 - tortoise.state.starsArr[i].vSpeed;
     }
     tortoise.setState(state => {
@@ -147,11 +142,11 @@ let flapsMoving = (obj, keysPressed) => {
     }
 }
 
-let consts = {
+const consts = {
     starColors: ['#C5DE79', '#C0DA74', '#ADC668', '#9AB15D', '#869D51', '#738846', '#60743A', '#4D602E', '#3A4B23', '#263717'],
-    maxStarsCount: 1,
+    maxStarsCount: 3,
     bounceFactor: -0.33,
-    maxVelocity: 0.25,
+    maxVelocity: 0.35,
     maxRotation: 2.5,
     tortoiseSize: 40,
 }
@@ -163,7 +158,6 @@ export {
     verifyBounce,
     checkCollisions,
     placeStar,
-    // moveStar,
     calculateVelocityAndRotation,
     flapsMoving,
     consts

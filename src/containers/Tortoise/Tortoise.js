@@ -13,10 +13,8 @@ import {
 
 class Tortoise extends Component {
     state = {
-        scrHeight: this.props.scrHeight || window.innerHeight,
-        scrWidth: this.props.scrWidth || window.innerWidth,
-        left: this.props.left, // tortoise horiz. position
-        top: this.props.top, // tortoise vert. position
+        left: this.props.scrWidth / 2 + 'px', // tortoise horiz. position
+        top: this.props.scrWidth / 2 + 'px', // tortoise vert. position
         rotation: this.props.rotation || 0,
         horizontalVelocity: this.props.horizontalVelocity || 0,
         verticalVelocity: this.props.verticalVelocity || 0,
@@ -34,21 +32,14 @@ class Tortoise extends Component {
             sign: 1, 
             key: 'd'
         },
-        starsArr: [
-            {
-                left: '',
-                top: '',
-                size: 20,
-                hSpeed: 0,
-                vSpeed: 0
-            }
-        ],
+        starsArr: [],
         rearRightTransform: '',
         rearLeftTransform: '',
         head: '-10px',
         rotationVelocity: 0,
     }
-    starInterval;
+    starInterval = [];
+    tmOut;
 
     update = () => {
         let tempVal = {
@@ -56,8 +47,8 @@ class Tortoise extends Component {
             rightFlap: {...this.state.rightFlap},
             rearLeftTransform: "rotate(-20deg)", // starting position
             rearRightTransform: "rotate(20deg)",
-            top: Number(this.state.top.slice(0, -2)),
-            left: Number(this.state.left.slice(0, -2)),
+            top: parseFloat(this.state.top), // Number(this.state.top.slice(0, -2)),
+            left: parseFloat(this.state.left), //Number(this.state.left.slice(0, -2)),
             rotation: this.state.rotation + 0,
             rotationVelocity: this.state.rotationVelocity,
             head: '-10px',
@@ -81,17 +72,17 @@ class Tortoise extends Component {
         }
         Object.assign(tempVal, calculateVelocityAndRotation(tempVal, consts.maxRotation));
 
-        for (let i = 0; i < consts.maxStarsCount; i++) {
+        for (let i = 0; i < this.state.starsArr.length; i++) {
             if (checkCollisions(
                 consts.tortoiseSize, tempVal.left, tempVal.top,  // tortoise
                 this.state.starsArr[i] // star
             )) {
-                window.clearInterval(this.starInterval);
+                window.clearInterval(this.starInterval[i]);
                 placeStar(i, this)
             }
         }
 
-        Object.assign(tempVal, verifyBounce(tempVal.left, tempVal.top, tempVal.horizontalVelocity, tempVal.verticalVelocity, consts.tortoiseSize, this.state.scrWidth, this.state.scrHeight, consts.bounceFactor));
+        Object.assign(tempVal, verifyBounce(tempVal.left, tempVal.top, tempVal.horizontalVelocity, tempVal.verticalVelocity, consts.tortoiseSize, this.props.scrWidth, this.props.scrHeight, consts.bounceFactor));
         Object.assign(tempVal, setPlayerPosition(tempVal.left, tempVal.top, tempVal.horizontalVelocity, tempVal.verticalVelocity));
         Object.assign(tempVal, setPlayerRotation(tempVal.rotation));
         
@@ -99,13 +90,13 @@ class Tortoise extends Component {
     }
 
     componentDidMount() {
+        window.onresize = () => this.props.checkWindowSize();
         this.interval = window.setInterval(this.update, this.props.frameLength);
     }
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.starsArr[0].left === '' && this.state.scrHeight && this.state.scrWidth) {
-            for (let i = 0; i < consts.maxStarsCount; i++) {
-                placeStar(i, this);
-            }
+        if (this.state.starsArr.length < consts.maxStarsCount && this.props.scrHeight && this.props.scrWidth) {
+            // this.tmOut = window.setTimeout(placeStar.bind(null, this.state.starsArr.length, this), Math.floor(Math.random() * 1000) + 500)
+            placeStar(this.state.starsArr.length, this);
         }
     }
     componentWillUnmount() {
@@ -114,6 +105,15 @@ class Tortoise extends Component {
     }
 
     render() { 
+        let stars = this.state.starsArr.map((item, i) => {
+            return (
+                <div className="star" key={i}
+                    style={{
+                        left: this.state.starsArr[i].left,
+                        top: this.state.starsArr[i].top,
+                        backgroundColor: consts.starColors[i] }}></div>
+            )
+        })
         return ( 
             <div>
                 <div id={styles.Tortoise} 
@@ -134,12 +134,7 @@ class Tortoise extends Component {
                     <div className={styles.rear} style={{transform: this.state.rearRightTransform}}></div>
                     <div className={[styles.rear, styles.left].join(' ')} style={{transform: this.state.rearLeftTransform}}></div>
                 </div>
-                <div id="star"
-                    style={{
-                        left: this.state.starsArr[0].left,
-                        top: this.state.starsArr[0].top,
-                        backgroundColor: consts.starColors[0]
-                }}></div>
+                { stars }
             </div>
          );
     }
