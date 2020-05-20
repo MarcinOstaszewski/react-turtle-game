@@ -3,6 +3,8 @@ import styles from './Tortoise.module.css'
 
 class Tortoise extends Component {
     state = {
+        scrHeight: this.props.scrHeight || window.innerHeight,
+        scrWidth: this.props.scrWidth || window.innerWidth,
         left: this.props.left, // tortoise horiz. position
         top: this.props.top, // tortoise vert. position
         rotation: this.props.rotation || 0,
@@ -22,16 +24,27 @@ class Tortoise extends Component {
             sign: 1, 
             key: 'd'
         },
+        starsArr: [
+            {
+                left: '',
+                top: '',
+                size: 20,
+                hSpeed: 0,
+                vSpeed: 0
+            }
+        ],
         rearRightTransform: '',
         rearLeftTransform: '',
         head: '-10px',
         rotationVelocity: 0,
     }
-    frameLength = 16;
+    starColors = ['#C5DE79', '#C0DA74', '#ADC668', '#9AB15D', '#869D51', '#738846', '#60743A', '#4D602E', '#3A4B23', '#263717']
+    starInterval;
+    maxStarsCount = 1;
     bounceFactor = -0.33;
     maxVelocity = 0.25;
     maxRotation = 2.5;
-    size = 20;
+    size = 40;
 
     flapsMoving = (obj) => {
         let flap = Object.assign({}, {...obj})
@@ -45,8 +58,7 @@ class Tortoise extends Component {
             } else return {}
         } else if (flap.moving === 30) { // flap starts to return
             return {
-                        transform: 'rotate(' + (flap.sign ? '-' : '') + '80deg)',
-                        // transform: null,
+                transform: 'rotate(' + (flap.sign ? '-' : '') + '80deg)',
                 moving: --flap.moving,
                 speed: 0
             }
@@ -88,17 +100,15 @@ class Tortoise extends Component {
         }
     }
 
-    verifyBounce = (left, top, hVelocity, vVelocity) => {
+    verifyBounce = (left, top, hVelocity, vVelocity, size, width, height, bounceFactor) => {
         let values = {
             horizontalVelocity: hVelocity,
             verticalVelocity: vVelocity,
         }
-        if (top + hVelocity > this.props.height - this.size) { values.horizontalVelocity *= this.bounceFactor; }
-        if (left + vVelocity > this.props.width - this.size) {
-            values.verticalVelocity *= this.bounceFactor;
-        }
-        if (top + hVelocity < 0) { values.horizontalVelocity *= this.bounceFactor; }
-        if (left + vVelocity < 0) { values.verticalVelocity *= this.bounceFactor; }
+        if (top + hVelocity > height - size) { values.horizontalVelocity *= bounceFactor; }
+        if (left + vVelocity > width - size) { values.verticalVelocity *= bounceFactor; }
+        if (top + hVelocity < 0) { values.horizontalVelocity *= bounceFactor; }
+        if (left + vVelocity < 0) { values.verticalVelocity *= bounceFactor; }
         return values;
     }
 
@@ -115,7 +125,7 @@ class Tortoise extends Component {
         return rot;
     }
 
-    moveTortoise = () => {
+    update = () => {
         let tempVal = {
             leftFlap: {...this.state.leftFlap},
             rightFlap: {...this.state.rightFlap},
@@ -146,20 +156,112 @@ class Tortoise extends Component {
         }
         Object.assign(tempVal, this.calculateVelocityAndRotation(tempVal));
 
-        // this.checkCollisions(tempVal.left, tempVal.top);
+        for (let i = 0; i < this.maxStarsCount; i++) {
+            if (this.checkCollisions(
+                this.size, tempVal.left, tempVal.top,  // tortoise
+                this.state.starsArr[i] // star
+            )) {
+                window.clearInterval(this.starInterval);
+                this.placeStar(0)
+            }
+        }
 
-        Object.assign(tempVal, this.verifyBounce(tempVal.left, tempVal.top, tempVal.horizontalVelocity, tempVal.verticalVelocity));
+        Object.assign(tempVal, this.verifyBounce(tempVal.left, tempVal.top, tempVal.horizontalVelocity, tempVal.verticalVelocity, this.size, this.state.scrWidth, this.state.scrHeight, this.bounceFactor));
         Object.assign(tempVal, this.setPlayerPosition(tempVal.left, tempVal.top, tempVal.horizontalVelocity, tempVal.verticalVelocity));
         Object.assign(tempVal, this.setPlayerRotation(tempVal.rotation));
         
         this.setState({...tempVal})
     }
 
+    checkCollisions = (s1, x1, y1, star) => {
+        let s2 = star.size;
+        let x2 = parseInt(star.left.slice(0, -2));
+        let y2 = parseInt(star.top.slice(0, -2));
+        let dx = x1 - x2;
+        let dy = y1 - y2;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        return dist < (s1 + s2) * 0.7 ? true : false;
+    }
+    
+    placeStar = (i) => {
+        let x = Math.floor(Math.random() * (this.state.scrWidth - 60) + 30);
+        let y = Math.floor(Math.random() * (this.state.scrHeight - 60) + 30);
+        this.setState(state => {
+            const stars = state.starsArr.map((item,j) => {
+                if (j === i) {
+                    return {
+                        ...item,
+                        hSpeed: Math.random() * 4 - 2,
+                        vSpeed: Math.random() * 4 - 2,
+                        left: x + 'px',
+                        top: y + 'px'
+                    };
+                } else {
+                    return item;
+                };
+            })
+
+            return { starsArr: stars }
+        })
+        this.starInterval = window.setInterval(this.moveStar.bind(null, 0), this.props.frameLength);
+    }
+            
+    moveStar = (i) => {
+        let left = Number(this.state.starsArr[i].left.slice(0, -2));
+        let top = Number(this.state.starsArr[i].top.slice(0, -2));
+        let hSpeed = this.state.starsArr[i].hSpeed;
+        let vSpeed = this.state.starsArr[i].vSpeed;
+        if (left + this.state.starsArr[i].hSpeed <= 0) {
+            hSpeed = 0 - this.state.starsArr[i].hSpeed;
+        }
+        if (left + this.state.starsArr[i].hSpeed > this.state.scrWidth - this.state.starsArr[i].size) {
+            hSpeed = 0 - this.state.starsArr[i].hSpeed;
+        }
+        if (top + this.state.starsArr[i].vSpeed < 0) {
+            vSpeed = 0 - this.state.starsArr[i].vSpeed;
+        }
+        if (top + this.state.starsArr[i].vSpeed > this.state.scrHeight - this.state.starsArr[i].size) {
+            vSpeed = 0 - this.state.starsArr[i].vSpeed;
+        }
+        this.setState(state => {
+            const stars = state.starsArr.map((item,j) => {
+                if (j === i) {
+                    return {
+                        ...item, // this.state.starsArr[i]
+                        left: (left + hSpeed) + 'px',
+                        top: (top + vSpeed) + 'px',
+                        vSpeed: vSpeed,
+                        hSpeed: hSpeed
+                    }
+                } else {
+                    return item
+                }
+            })
+
+            return { starsArr: stars}
+            // star: {
+            //     ...this.state.starsArr[i],
+            //     left: (left + hSpeed) + 'px',
+            //     top: (top + vSpeed) + 'px',
+            //     vSpeed: vSpeed,
+            //     hSpeed: hSpeed
+            // }
+        })
+    }
+
     componentDidMount() {
-        this.interval = window.setInterval(this.moveTortoise, this.frameLength);
+        this.interval = window.setInterval(this.update, this.props.frameLength);
+    }
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.starsArr[0].left === '' && this.state.scrHeight && this.state.scrWidth) {
+            for (let i = 0; i < this.maxStarsCount; i++) {
+                this.placeStar(i);
+            }
+        }
     }
     componentWillUnmount() {
         window.clearInterval(this.interval);
+        window.clearInterval(this.starInterval);
     }
 
     render() { 
@@ -183,6 +285,12 @@ class Tortoise extends Component {
                     <div className={styles.rear} style={{transform: this.state.rearRightTransform}}></div>
                     <div className={[styles.rear, styles.left].join(' ')} style={{transform: this.state.rearLeftTransform}}></div>
                 </div>
+                <div id="star"
+                    style={{
+                        left: this.state.starsArr[0].left,
+                        top: this.state.starsArr[0].top,
+                        backgroundColor: this.starColors[0]
+                }}></div>
             </div>
          );
     }
