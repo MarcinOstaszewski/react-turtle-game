@@ -5,7 +5,7 @@ import {
     setPlayerRotation,
     verifyBounce,
     checkCollisions,
-    moveStar,
+    placeStar,
     calculateVelocityAndRotation,
     flapsMoving,
     consts
@@ -87,7 +87,7 @@ class Tortoise extends Component {
                 this.state.starsArr[i] // star
             )) {
                 window.clearInterval(this.starInterval);
-                this.placeStar(0)
+                placeStar(i, this)
             }
         }
 
@@ -97,29 +97,6 @@ class Tortoise extends Component {
         
         this.setState({...tempVal})
     }
-    
-    placeStar = (i) => {
-        let x = Math.floor(Math.random() * (this.state.scrWidth - 60) + 30);
-        let y = Math.floor(Math.random() * (this.state.scrHeight - 60) + 30);
-        this.setState(state => {
-            const stars = state.starsArr.map((item, j) => {
-                if (j === i) {
-                    return {
-                        ...item,
-                        hSpeed: Math.random() * 4 - 2,
-                        vSpeed: Math.random() * 4 - 2,
-                        left: x + 'px',
-                        top: y + 'px'
-                    };
-                } else {
-                    return item;
-                };
-            })
-
-            return { starsArr: stars }
-        })
-        this.starInterval = window.setInterval(moveStar.bind(null, i, this), this.props.frameLength);
-    }    
 
     componentDidMount() {
         this.interval = window.setInterval(this.update, this.props.frameLength);
@@ -127,7 +104,7 @@ class Tortoise extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (this.state.starsArr[0].left === '' && this.state.scrHeight && this.state.scrWidth) {
             for (let i = 0; i < consts.maxStarsCount; i++) {
-                this.placeStar(i);
+                placeStar(i, this);
             }
         }
     }

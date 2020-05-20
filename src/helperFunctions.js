@@ -34,6 +34,30 @@ let checkCollisions = (s1, x1, y1, star) => {
     return dist < (s1 + s2) * 0.7 ? true : false;
 }
 
+let placeStar = (i, that) => {
+    let tortoise = that;
+    let x = Math.floor(Math.random() * (tortoise.state.scrWidth - 60) + 30);
+    let y = Math.floor(Math.random() * (tortoise.state.scrHeight - 60) + 30);
+    tortoise.setState(state => {
+        const stars = state.starsArr.map((item, j) => {
+            if (j === i) {
+                return {
+                    ...item,
+                    hSpeed: Math.random() * 4 - 2,
+                    vSpeed: Math.random() * 4 - 2,
+                    left: x + 'px',
+                    top: y + 'px'
+                };
+            } else {
+                return item;
+            };
+        })
+
+        return { starsArr: stars }
+    })
+    tortoise.starInterval = window.setInterval(moveStar.bind(null, i, tortoise), tortoise.props.frameLength);
+}
+
 let moveStar = (i, that) => {
     let tortoise = that
     let left = Number(tortoise.state.starsArr[i].left.slice(0, -2));
@@ -138,7 +162,8 @@ export {
     setPlayerRotation, 
     verifyBounce,
     checkCollisions,
-    moveStar,
+    placeStar,
+    // moveStar,
     calculateVelocityAndRotation,
     flapsMoving,
     consts
