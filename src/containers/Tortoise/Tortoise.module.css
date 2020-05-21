@@ -65,3 +65,8 @@
     transform: rotate(-20deg);
     transform-origin: top right;
 }
+.star {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+}

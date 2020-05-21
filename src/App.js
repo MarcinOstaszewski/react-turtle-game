@@ -14,6 +14,10 @@ class App extends Component {
       left: 0,
       top: 0, 
     },
+    score: 0,
+    health: 100,
+    healthBarWidth: window.innerWidth / 2,
+    healthBarColor: '#26f12680',
   }
   frameLength = 16;
 
@@ -21,6 +25,17 @@ class App extends Component {
     this.setState({
       windowInnerWidth: window.innerWidth,
       windowInnerHeight: window.innerHeight
+    })
+  }
+
+  addToScore = (add) => {
+    this.setState({ score: this.state.score + add })
+  }
+
+  updateHealth = (change) => {
+    this.setState({
+      healthBarWidth: this.state.healthBarWidth - change,
+
     })
   }
 
@@ -41,11 +56,16 @@ class App extends Component {
   }
 
   render() {
+    let style = {
+      width: this.state.healthBarWidth + 'px',
+      left: ((this.state.windowInnerWidth - this.state.healthBarWidth) / 2) + 'px',
+      backgroundColor: this.state.healthBarColor
+    }
     return ( 
       <div>
         <Scene width={this.state.windowInnerWidth + 'px'}
           height={this.state.windowInnerHeight + 'px'}
-          backgroundColor="#444" 
+          backgroundColor="#132f4c"
         />
         <Tortoise scrWidth={this.state.windowInnerWidth}
           scrHeight={this.state.windowInnerHeight}
@@ -53,7 +73,12 @@ class App extends Component {
           keysPressed={this.state.keysPressed}
           frameLength={this.frameLength}
           checkWindowSize={this.checkWindowSize}
+          addToScore={this.addToScore}
+          updateHealth={this.updateHealth}
+          health={this.state.health}
         />
+        <div id="healthbar" style={style}></div>
+        <div className="score">Score: <span id="score">{this.state.score}</span></div>
       </div>
   );
 }

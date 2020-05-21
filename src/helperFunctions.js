@@ -12,15 +12,35 @@ let setPlayerRotation = (rotation) => {
     return rot;
 }
 
-let verifyBounce = (left, top, hVelocity, vVelocity, size, width, height, bounceFactor) => {
+let verifyBounce = (tempVal, consts, props) => {
+    let { left, top, health } = tempVal;
+    let { bounceFactor, tortoiseSize } = consts;
+    let { scrWidth, scrHeight } = props;
+    let hVelocity = tempVal.horizontalVelocity;
+    let vVelocity = tempVal.verticalVelocity;
     let values = {
         horizontalVelocity: hVelocity,
         verticalVelocity: vVelocity,
+        health: health
     }
-    if (top + hVelocity > height - size) { values.horizontalVelocity *= bounceFactor; }
-    if (left + vVelocity > width - size) { values.verticalVelocity *= bounceFactor; }
-    if (top + hVelocity < 0) { values.horizontalVelocity *= bounceFactor; }
-    if (left + vVelocity < 0) { values.verticalVelocity *= bounceFactor; }
+    
+    if (top + hVelocity > scrHeight - tortoiseSize) {
+        values.health -= Math.abs(parseInt(values.horizontalVelocity));
+        values.horizontalVelocity *= bounceFactor;
+    }
+    if (left + vVelocity > scrWidth - tortoiseSize) {
+        values.health -= Math.abs(parseInt(values.verticalVelocity));
+        values.verticalVelocity *= bounceFactor;
+    }
+    if (top + hVelocity < 0) {
+        values.health -= Math.abs(parseInt(values.horizontalVelocity));
+        values.horizontalVelocity *= bounceFactor;
+    }
+    if (left + vVelocity < 0) {
+        values.health -= Math.abs(parseInt(values.verticalVelocity));
+        values.verticalVelocity *= bounceFactor;
+    }
+
     return values;
 }
 
@@ -45,7 +65,10 @@ let placeStar = (i, that) => {
             hSpeed: Math.random() * 4 - 2,
             vSpeed: Math.random() * 4 - 2,
             left: x + 'px',
-            top: y + 'px'
+            top: y + 'px',
+            bgColor: consts.starColors[getRandomNumBetween(0, consts.starColors.length)],
+            transform: getRandomNumBetween(0,90),
+            rotationVelocity: getRandomNumBetween(-4, 4)
         };
         return {starsArr: stars};
     })
@@ -53,23 +76,26 @@ let placeStar = (i, that) => {
     tortoise.starInterval[i] = window.setInterval(moveStar.bind(null, i, tortoise), tortoise.props.frameLength);
 }
 
+
 let moveStar = (i, that) => {
     let tortoise = that
-    let left = parseFloat(tortoise.state.starsArr[i].left);
-    let top = parseFloat(tortoise.state.starsArr[i].top);
-    let hSpeed = tortoise.state.starsArr[i].hSpeed;
-    let vSpeed = tortoise.state.starsArr[i].vSpeed;
-    if (left + tortoise.state.starsArr[i].hSpeed <= 0) {
-        hSpeed = 0 - tortoise.state.starsArr[i].hSpeed;
+    let star = tortoise.state.starsArr[i];
+    let left = parseFloat(star.left);
+    let top = parseFloat(star.top);
+    let transform = parseInt(star.transform) + star.rotationVelocity;
+    let hSpeed = star.hSpeed;
+    let vSpeed = star.vSpeed;
+    if (left + star.hSpeed <= 0) {
+        hSpeed = 0 - star.hSpeed;
     }
-    if (left + tortoise.state.starsArr[i].hSpeed > tortoise.props.scrWidth - tortoise.state.starsArr[i].size) {
-        hSpeed = 0 - tortoise.state.starsArr[i].hSpeed;
+    if (left + star.hSpeed > tortoise.props.scrWidth - star.size) {
+        hSpeed = 0 - star.hSpeed;
     }
-    if (top + tortoise.state.starsArr[i].vSpeed < 0) {
-        vSpeed = 0 - tortoise.state.starsArr[i].vSpeed;
+    if (top + star.vSpeed < 0) {
+        vSpeed = 0 - star.vSpeed;
     }
-    if (top + tortoise.state.starsArr[i].vSpeed > tortoise.props.scrHeight - tortoise.state.starsArr[i].size) {
-        vSpeed = 0 - tortoise.state.starsArr[i].vSpeed;
+    if (top + star.vSpeed > tortoise.props.scrHeight - star.size) {
+        vSpeed = 0 - star.vSpeed;
     }
     tortoise.setState(state => {
         const stars = state.starsArr.map((item, j) => {
@@ -79,7 +105,8 @@ let moveStar = (i, that) => {
                     left: (left + hSpeed) + 'px',
                     top: (top + vSpeed) + 'px',
                     vSpeed: vSpeed,
-                    hSpeed: hSpeed
+                    hSpeed: hSpeed,
+                    transform: transform
                 }
             } else { return item }
         })
@@ -142,13 +169,17 @@ let flapsMoving = (obj, keysPressed) => {
     }
 }
 
+let getRandomNumBetween = (min, max) => {
+    return Math.floor(Math.random() * max - min) + min;
+}
+
 const consts = {
-    starColors: ['#C5DE79', '#C0DA74', '#ADC668', '#9AB15D', '#869D51', '#738846', '#60743A', '#4D602E', '#3A4B23', '#263717'],
+    starColors: ['#C5DE79', '#C0DA74', '#ADC668', '#9AB15D', '#869D51', '#738846', '#60743A', '#4D602E', '#3A4B23', '#354e1f'], //  '#263717'
     maxStarsCount: 3,
     bounceFactor: -0.33,
     maxVelocity: 0.35,
     maxRotation: 2.5,
-    tortoiseSize: 40,
+    tortoiseSize: 35,
 }
 
 
@@ -160,5 +191,6 @@ export {
     placeStar,
     calculateVelocityAndRotation,
     flapsMoving,
+    getRandomNumBetween,
     consts
 }
