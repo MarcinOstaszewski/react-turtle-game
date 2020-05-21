@@ -10,14 +10,8 @@ class App extends Component {
     windowInnerHeight: window.innerHeight,
     rotation: 0,
     keysPressed: {},
-    tortoise: {
-      left: 0,
-      top: 0, 
-    },
     score: 0,
     health: 100,
-    healthBarWidth: window.innerWidth / 2,
-    healthBarColor: '#26f12680',
   }
   frameLength = 16;
 
@@ -33,10 +27,16 @@ class App extends Component {
   }
 
   updateHealth = (change) => {
-    this.setState({
-      healthBarWidth: this.state.healthBarWidth - change,
-
-    })
+    if (this.state.health - change >= 0) {
+      this.setState({
+        health: this.state.health - change * 3,
+      })
+    } else {
+      this.setState({
+        health: 0,
+      })
+      console.log('game over!')
+    }
   }
 
   componentDidMount() {
@@ -52,20 +52,16 @@ class App extends Component {
       }
       this.setState({ keysPressed: keys })
     }
-    this.checkWindowSize();
   }
 
   render() {
-    let style = {
-      width: this.state.healthBarWidth + 'px',
-      left: ((this.state.windowInnerWidth - this.state.healthBarWidth) / 2) + 'px',
-      backgroundColor: this.state.healthBarColor
-    }
     return ( 
       <div>
-        <Scene width={this.state.windowInnerWidth + 'px'}
-          height={this.state.windowInnerHeight + 'px'}
+        <Scene width={this.state.windowInnerWidth}
+          height={this.state.windowInnerHeight}
           backgroundColor="#132f4c"
+          health={this.state.health}
+          score={this.state.score}
         />
         <Tortoise scrWidth={this.state.windowInnerWidth}
           scrHeight={this.state.windowInnerHeight}
@@ -77,8 +73,6 @@ class App extends Component {
           updateHealth={this.updateHealth}
           health={this.state.health}
         />
-        <div id="healthbar" style={style}></div>
-        <div className="score">Score: <span id="score">{this.state.score}</span></div>
       </div>
   );
 }

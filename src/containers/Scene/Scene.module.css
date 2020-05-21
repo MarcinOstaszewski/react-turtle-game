@@ -1,0 +1,12 @@
+#healthbar {
+    position: fixed;
+    top: 10px;
+    height: 20px;
+}
+.score {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    color: #ccc;
+    font-size: 16px;
+}
