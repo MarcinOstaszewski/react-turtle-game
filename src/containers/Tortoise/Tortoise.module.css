@@ -70,3 +70,10 @@
     width: 20px;
     height: 20px;
 }
+.star:before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    transform: rotate(45deg);
+}

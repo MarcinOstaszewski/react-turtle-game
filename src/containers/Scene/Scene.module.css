@@ -5,8 +5,9 @@
 }
 .score {
     position: fixed;
-    top: 10px;
-    left: 10px;
+    top: 5px;
+    left: 50px;
     color: #ccc;
-    font-size: 16px;
+    font-size: 20px;
+    font-weight: bold;
 }
