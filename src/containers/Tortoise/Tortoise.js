@@ -43,60 +43,62 @@ class Tortoise extends Component {
     tmOut;
 
     update = () => {
-        let tempVal = {
-            leftFlap: {...this.state.leftFlap},
-            rightFlap: {...this.state.rightFlap},
-            rearLeftTransform: "rotate(-20deg)", // starting position
-            rearRightTransform: "rotate(20deg)",
-            top: parseFloat(this.state.top), // Number(this.state.top.slice(0, -2)),
-            left: parseFloat(this.state.left), //Number(this.state.left.slice(0, -2)),
-            rotation: this.state.rotation + 0,
-            rotationVelocity: this.state.rotationVelocity,
-            head: '-10px',
-            health: this.state.health
-        }
-        
-        if (this.props.keysPressed['w']) { tempVal.head = '-20px'; }
-        
-        Object.assign(tempVal.leftFlap, flapsMoving(tempVal.leftFlap, this.props.keysPressed)) // overwrite in tempVal variables for flap(s)
-        Object.assign(tempVal.rightFlap, flapsMoving(tempVal.rightFlap, this.props.keysPressed))
-        
-        tempVal.rotation = tempVal.rotation + tempVal.leftFlap.speed - tempVal.rightFlap.speed;
-
-        tempVal.horizontalVelocity = this.state.horizontalVelocity - (consts.maxVelocity * (tempVal.leftFlap.speed + tempVal.rightFlap.speed) / 4) * Math.cos(this.state.rotation * Math.PI / 180);
-        tempVal.verticalVelocity = this.state.verticalVelocity + (consts.maxVelocity * (tempVal.leftFlap.speed + tempVal.rightFlap.speed) / 4) * Math.sin(this.state.rotation * Math.PI / 180);
-        
-        if (this.props.keysPressed['s']) {
-            tempVal.rearRightTransform = "rotate(-40deg)";
-            tempVal.rearLeftTransform = "rotate(40deg)";
-            tempVal.horizontalVelocity = 0.97 * tempVal.horizontalVelocity;
-            tempVal.verticalVelocity = 0.97 * tempVal.verticalVelocity;
-        }
-        Object.assign(tempVal, calculateVelocityAndRotation(tempVal, consts.maxRotation));
-
-        for (let i = 0; i < this.state.starsArr.length; i++) {
-            let star = this.state.starsArr[i];
-            if (checkCollisions(
-                consts.tortoiseSize, tempVal.left, tempVal.top,  // tortoise
-                star // star
-            )) {
-                let score = parseInt(Math.abs(tempVal.horizontalVelocity) + Math.abs(tempVal.verticalVelocity) + Math.abs(star.hSpeed) + Math.abs(star.vSpeed));
-                this.props.addToScore(score);
-                window.clearInterval(this.starInterval[i]);
-                placeStar(i, this)
+        if (this.props.isGameOn) {
+            let tempVal = {
+                leftFlap: {...this.state.leftFlap},
+                rightFlap: {...this.state.rightFlap},
+                rearLeftTransform: "rotate(-20deg)", // starting position
+                rearRightTransform: "rotate(20deg)",
+                top: parseFloat(this.state.top), // Number(this.state.top.slice(0, -2)),
+                left: parseFloat(this.state.left), //Number(this.state.left.slice(0, -2)),
+                rotation: this.state.rotation + 0,
+                rotationVelocity: this.state.rotationVelocity,
+                head: '-10px',
+                health: this.state.health
             }
-        }
+            
+            if (this.props.keysPressed['w']) { tempVal.head = '-20px'; }
+            
+            Object.assign(tempVal.leftFlap, flapsMoving(tempVal.leftFlap, this.props.keysPressed)) // overwrite in tempVal variables for flap(s)
+            Object.assign(tempVal.rightFlap, flapsMoving(tempVal.rightFlap, this.props.keysPressed))
+            
+            tempVal.rotation = tempVal.rotation + tempVal.leftFlap.speed - tempVal.rightFlap.speed;
 
-        Object.assign(tempVal, verifyBounce(tempVal, consts, this.props));
-        Object.assign(tempVal, setPlayerPosition(tempVal.left, tempVal.top, tempVal.horizontalVelocity, tempVal.verticalVelocity));
-        Object.assign(tempVal, setPlayerRotation(tempVal.rotation));
+            tempVal.horizontalVelocity = this.state.horizontalVelocity - (consts.maxVelocity * (tempVal.leftFlap.speed + tempVal.rightFlap.speed) / 4) * Math.cos(this.state.rotation * Math.PI / 180);
+            tempVal.verticalVelocity = this.state.verticalVelocity + (consts.maxVelocity * (tempVal.leftFlap.speed + tempVal.rightFlap.speed) / 4) * Math.sin(this.state.rotation * Math.PI / 180);
+            
+            if (this.props.keysPressed['s']) {
+                tempVal.rearRightTransform = "rotate(-40deg)";
+                tempVal.rearLeftTransform = "rotate(40deg)";
+                tempVal.horizontalVelocity = 0.97 * tempVal.horizontalVelocity;
+                tempVal.verticalVelocity = 0.97 * tempVal.verticalVelocity;
+            }
+            Object.assign(tempVal, calculateVelocityAndRotation(tempVal, consts.maxRotation));
 
-        let healthChange = this.state.health - tempVal.health
+            for (let i = 0; i < this.state.starsArr.length; i++) {
+                let star = this.state.starsArr[i];
+                if (checkCollisions(
+                    consts.tortoiseSize, tempVal.left, tempVal.top,  // tortoise
+                    star // star
+                )) {
+                    let score = parseInt(Math.abs(tempVal.horizontalVelocity) + Math.abs(tempVal.verticalVelocity) + Math.abs(star.hSpeed) + Math.abs(star.vSpeed));
+                    this.props.addToScore(score);
+                    window.clearInterval(this.starInterval[i]);
+                    placeStar(i, this)
+                }
+            }
 
-        this.setState({...tempVal})
-        
-        if (healthChange !== 0) {
-            this.props.updateHealth(healthChange)
+            Object.assign(tempVal, verifyBounce(tempVal, consts, this.props));
+            Object.assign(tempVal, setPlayerPosition(tempVal.left, tempVal.top, tempVal.horizontalVelocity, tempVal.verticalVelocity));
+            Object.assign(tempVal, setPlayerRotation(tempVal.rotation));
+
+            let healthChange = this.state.health - tempVal.health
+
+            this.setState({...tempVal})
+            
+            if (healthChange !== 0) {
+                this.props.updateHealth(healthChange)
+            }
         }
     }
 
