@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import './App.css';
 import Scene from './containers/Scene/Scene';
 import Tortoise from './containers/Tortoise/Tortoise';
+import Start from './components/Start/Start';
+import GameOver from './components/GameOver/GameOver';
+import history from './components/history';
 
 class App extends Component {
-
   state = {
     windowInnerWidth: window.innerWidth,
     windowInnerHeight: window.innerHeight,
     rotation: 0,
     keysPressed: {},
     score: 0,
-    health: 100,
+    health: 10,
+    isGameOn: true
   }
   frameLength = 16;
 
@@ -27,6 +31,7 @@ class App extends Component {
   }
 
   updateHealth = (change) => {
+    console.log(history)
     if (this.state.health - change >= 0) {
       this.setState({
         health: this.state.health - change * 3,
@@ -34,8 +39,11 @@ class App extends Component {
     } else {
       this.setState({
         health: 0,
+        isGameOn: false,
+        gameOver: <GameOver score={this.state.score}/>
       })
-      console.log('game over!')
+      history.push('/gameover')
+      history.go();
     }
   }
 
@@ -56,26 +64,38 @@ class App extends Component {
 
   render() {
     return ( 
-      <div>
-        <Scene width={this.state.windowInnerWidth}
-          height={this.state.windowInnerHeight}
-          backgroundColor="#132f4c"
-          health={this.state.health}
-          score={this.state.score}
-        />
-        <Tortoise scrWidth={this.state.windowInnerWidth}
-          scrHeight={this.state.windowInnerHeight}
-          rotation={this.state.rotation}
-          keysPressed={this.state.keysPressed}
-          frameLength={this.frameLength}
-          checkWindowSize={this.checkWindowSize}
-          addToScore={this.addToScore}
-          updateHealth={this.updateHealth}
-          health={this.state.health}
-        />
-      </div>
-  );
-}
+      <BrowserRouter>
+        <div>
+          <Scene width={this.state.windowInnerWidth}
+            height={this.state.windowInnerHeight}
+            backgroundColor="#132f4c"
+            health={this.state.health}
+            score={this.state.score}
+          />
+          <Switch>
+            <Route path="/start" component={Start} />
+            <Route path="/gameon" render={()=>
+              <Tortoise scrWidth={this.state.windowInnerWidth}
+                scrHeight={this.state.windowInnerHeight}
+                rotation={this.state.rotation}
+                keysPressed={this.state.keysPressed}
+                frameLength={this.frameLength}
+                checkWindowSize={this.checkWindowSize}
+                addToScore={this.addToScore}
+                updateHealth={this.updateHealth}
+                health={this.state.health}
+                isGameOn={this.state.isGameOn}
+              />
+            }>
+            </Route>
+            <Route path="/gameover" render={() => 
+              this.state.gameOver
+            }/>
+          </Switch>
+        </div>
+      </BrowserRouter>
+    );
+  }
 }
 
 export default App;
