@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/react-turtle-game/static/css/main.b7c559e8.chunk.css",
+    "main.js": "/react-turtle-game/static/js/main.f5ce6086.chunk.js",
+    "main.js.map": "/react-turtle-game/static/js/main.f5ce6086.chunk.js.map",
+    "runtime-main.js": "/react-turtle-game/static/js/runtime-main.a2f9544a.js",
+    "runtime-main.js.map": "/react-turtle-game/static/js/runtime-main.a2f9544a.js.map",
+    "static/js/2.7287e7c8.chunk.js": "/react-turtle-game/static/js/2.7287e7c8.chunk.js",
+    "static/js/2.7287e7c8.chunk.js.map": "/react-turtle-game/static/js/2.7287e7c8.chunk.js.map",
+    "index.html": "/react-turtle-game/index.html",
+    "precache-manifest.494c547702845788d18f313fa06917fd.js": "/react-turtle-game/precache-manifest.494c547702845788d18f313fa06917fd.js",
+    "service-worker.js": "/react-turtle-game/service-worker.js",
+    "static/css/main.b7c559e8.chunk.css.map": "/react-turtle-game/static/css/main.b7c559e8.chunk.css.map",
+    "static/js/2.7287e7c8.chunk.js.LICENSE.txt": "/react-turtle-game/static/js/2.7287e7c8.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.a2f9544a.js",
+    "static/js/2.7287e7c8.chunk.js",
+    "static/css/main.b7c559e8.chunk.css",
+    "static/js/main.f5ce6086.chunk.js"
+  ]
+}
