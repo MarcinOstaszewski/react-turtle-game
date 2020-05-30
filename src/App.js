@@ -1,21 +1,18 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import './App.css';
 import Scene from './containers/Scene/Scene';
 import Tortoise from './containers/Tortoise/Tortoise';
-import Start from './components/Start/Start';
-import GameOver from './components/GameOver/GameOver';
-import history from './components/history';
 
 class App extends Component {
+
   state = {
     windowInnerWidth: window.innerWidth,
     windowInnerHeight: window.innerHeight,
     rotation: 0,
     keysPressed: {},
     score: 0,
-    health: 10,
-    isGameOn: true
+    health: 100,
+    gameState: 'start'
   }
   frameLength = 16;
 
@@ -31,20 +28,33 @@ class App extends Component {
   }
 
   updateHealth = (change) => {
-    console.log(history)
-    if (this.state.health - change >= 0) {
+    if (this.state.health - change >= 100) {
       this.setState({
-        health: this.state.health - change * 3,
+        health: 100
+      })
+    } else if (this.state.health - change * 2 > 0) {
+      this.setState({
+        health: this.state.health - change * 2,
       })
     } else {
-      this.setState({
-        health: 0,
-        isGameOn: false,
-        gameOver: <GameOver score={this.state.score}/>
-      })
-      history.push('/gameover')
-      history.go();
+      this.changeGameState('over')
     }
+  }
+
+  changeGameState = (text) => {
+    let newState = {
+      gameState: text
+    }
+    if (text === 'game') {
+      Object.assign(newState, {
+        rotation: 0,
+        keysPressed: {},
+        score: 0,
+        health: 100,
+      })
+    }
+    if (text === 'over') { localStorage['hiscore'] = Math.max(this.state.score, localStorage['hiscore']) }
+    this.setState({ ...newState })
   }
 
   componentDidMount() {
@@ -64,38 +74,29 @@ class App extends Component {
 
   render() {
     return ( 
-      <BrowserRouter>
-        <div>
-          <Scene width={this.state.windowInnerWidth}
-            height={this.state.windowInnerHeight}
-            backgroundColor="#132f4c"
-            health={this.state.health}
-            score={this.state.score}
-          />
-          <Switch>
-            <Route path="/start" component={Start} />
-            <Route path="/gameon" render={()=>
-              <Tortoise scrWidth={this.state.windowInnerWidth}
-                scrHeight={this.state.windowInnerHeight}
-                rotation={this.state.rotation}
-                keysPressed={this.state.keysPressed}
-                frameLength={this.frameLength}
-                checkWindowSize={this.checkWindowSize}
-                addToScore={this.addToScore}
-                updateHealth={this.updateHealth}
-                health={this.state.health}
-                isGameOn={this.state.isGameOn}
-              />
-            }>
-            </Route>
-            <Route path="/gameover" render={() => 
-              this.state.gameOver
-            }/>
-          </Switch>
-        </div>
-      </BrowserRouter>
-    );
-  }
+      <div>
+        <Scene width={this.state.windowInnerWidth}
+          height={this.state.windowInnerHeight}
+          backgroundColor="#132f4c"
+          health={this.state.health}
+          score={this.state.score}
+          gameState={this.state.gameState}
+          changeGameState={this.changeGameState}
+        />
+        <Tortoise scrWidth={this.state.windowInnerWidth}
+          scrHeight={this.state.windowInnerHeight}
+          rotation={this.state.rotation}
+          keysPressed={this.state.keysPressed}
+          frameLength={this.frameLength}
+          checkWindowSize={this.checkWindowSize}
+          addToScore={this.addToScore}
+          updateHealth={this.updateHealth}
+          health={this.state.health}
+          gameState={this.state.gameState}
+        />
+      </div>
+  );
+}
 }
 
 export default App;
