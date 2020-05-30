@@ -32,7 +32,7 @@ let verifyBounce = (tempVal, consts, props) => {
         values.health -= Math.abs(parseInt(values.verticalVelocity));
         values.verticalVelocity *= bounceFactor;
     }
-    if (top + hVelocity < 0) {
+    if (top + hVelocity < consts.topBarHeight) {
         values.health -= Math.abs(parseInt(values.horizontalVelocity));
         values.horizontalVelocity *= bounceFactor;
     }
@@ -66,9 +66,7 @@ let placeStar = (i, that) => {
             vSpeed: Math.random() * 4 - 2,
             left: x + 'px',
             top: y + 'px',
-            bgColor: consts.starColors[getRandomNumBetween(0, consts.starColors.length)],
-            transform: getRandomNumBetween(0,90),
-            rotationVelocity: getRandomNumBetween(-4, 4)
+            bgColor: getRandomNumBetween(0, consts.starColors.length),
         };
         return {starsArr: stars};
     })
@@ -91,7 +89,7 @@ let moveStar = (i, that) => {
     if (left + star.hSpeed > tortoise.props.scrWidth - star.size) {
         hSpeed = 0 - star.hSpeed;
     }
-    if (top + star.vSpeed < 0) {
+    if (top + star.vSpeed < consts.topBarHeight) {
         vSpeed = 0 - star.vSpeed;
     }
     if (top + star.vSpeed > tortoise.props.scrHeight - star.size) {
@@ -174,12 +172,13 @@ let getRandomNumBetween = (min, max) => {
 }
 
 const consts = {
-    starColors: ['#C5DE79', '#C0DA74', '#ADC668', '#9AB15D', '#869D51', '#738846', '#60743A', '#4D602E', '#3A4B23', '#354e1f'], //  '#263717'
+    starColors: ['#EF5757', '#e67474', '#DE9079', '#C5DE79', '#C0DA74', '#ADC668', '#9AB15D', '#869D51', '#738846', '#60743A'], //  '#263717'   ////  , '#4D602E' , '#3A4B23', '#354e1f'
     maxStarsCount: 3,
     bounceFactor: -0.33,
     maxVelocity: 0.35,
     maxRotation: 2.5,
     tortoiseSize: 35,
+    topBarHeight: 40,
 }
 
 
