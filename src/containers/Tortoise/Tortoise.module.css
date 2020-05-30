@@ -67,13 +67,7 @@
 }
 .star {
     position: fixed;
-    width: 20px;
-    height: 20px;
-}
-.star:before {
-    content: '';
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    transform: rotate(45deg);
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
 }
