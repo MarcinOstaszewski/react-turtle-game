@@ -6,10 +6,10 @@ const GameOver = (props) => {
     return ( 
         <div id={styles.gameover}>
             <h2>GAME OVER</h2>
-            <p> Your score: {props.score}</p>
+            <p>Your score: {props.score}</p>
             <div className={styles.btn}
-                onClick={()=> props.history.push('/gameon')}
-            >START</div>
+                onClick={ () => props.changeGameState('start') }
+            >RESTART</div>
         </div>
      );
 }
