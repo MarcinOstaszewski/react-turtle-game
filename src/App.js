@@ -95,8 +95,8 @@ class App extends Component {
           gameState={this.state.gameState}
         />
       </div>
-  );
-}
+    );
+  }
 }
 
 export default App;

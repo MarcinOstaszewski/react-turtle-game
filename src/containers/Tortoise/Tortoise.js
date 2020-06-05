@@ -8,12 +8,15 @@ import {
     placeStar,
     calculateVelocityAndRotation,
     flapsMoving,
+    // createObstacles,
     consts
 } from '../../helperFunctions';
 
 class Tortoise extends Component {
     state = {
         starsArr: [],
+        obstaclesArr: [], 
+        // createObstacles(consts.obstaclesAddressesArray, consts.topBarHeight, this.props.scrWidth, this.props.scrHeight),
         leftFlap: {
             transform: '',
         },
@@ -36,6 +39,7 @@ class Tortoise extends Component {
             horizontalVelocity: 0,
             verticalVelocity: 0,
             health: this.props.health,
+            pointsAnimated: [],
             leftFlap: {
                 moving: 0,
                 speed: 0,
@@ -67,7 +71,8 @@ class Tortoise extends Component {
                 rotation: this.state.rotation + 0,
                 rotationVelocity: this.state.rotationVelocity,
                 head: '-10px',
-                health: this.state.health
+                health: this.state.health,
+                pointsAnimated: this.state.pointsAnimated,
             }
 
             Object.assign(tempVal.leftFlap, flapsMoving(tempVal.leftFlap, this.props.keysPressed)) // overwrite in tempVal variables for flap(s)
@@ -92,19 +97,33 @@ class Tortoise extends Component {
                     consts.tortoiseSize, tempVal.left, tempVal.top,  // tortoise
                     star // star
                 )) {
+                    let healedPoints = 0;
                     let score = parseInt(Math.abs(tempVal.horizontalVelocity) + Math.abs(tempVal.verticalVelocity) + Math.abs(star.hSpeed) + Math.abs(star.vSpeed)) + (consts.starColors.length - star.bgColor);
                     if (star.bgColor < 3) {
-                        console.log('<3')
                         if (tempVal.health < 100) {
-                            console.log('health < 100')
-                            tempVal.health -= 4 * star.bgColor - 12; // heals 
+                            healedPoints = 4 * star.bgColor - 12
+                            tempVal.health -= healedPoints; // heals 
+                            score = 0;
                         } else {
-                            console.log('MULTI')
                             this.props.addToScore(score * 2); // OR multiples score when 100% healthy
                         }
                     } else {
                         this.props.addToScore(score); // OR just scores
                     }
+
+                    tempVal.pointsAnimated = [
+                        ...tempVal.pointsAnimated,
+                        {
+                            score: score,
+                            heal: healedPoints,
+                            style: {
+                                left: `${parseInt(star.left.slice(0, -2))}px`,
+                                top: `${parseInt(star.top.slice(0, -2))}px`,
+                                fontSize: 60 + 'px',
+                            }
+                        }
+                    ]
+
                     window.clearInterval(this.starInterval[i]);
                     placeStar(i, this)
                 }
@@ -125,6 +144,28 @@ class Tortoise extends Component {
                 healthChange = this.state.health - tempVal.health
             }
 
+            if (tempVal.pointsAnimated) {
+                tempVal.pointsAnimated = tempVal.pointsAnimated.map( item => {
+                    let fs = parseInt(item.style.fontSize);
+                    console.log(item.heal, item.score)
+                    let colorValues = '36, 91, 150,'
+                    if (item.heal) { colorValues = '68, 152, 27,' }
+                    if (fs < 300) {
+                        return {
+                            ...item,
+                            style: {
+                                ...item.style,
+                                fontSize: (fs + 2) + 'px',
+                                color: `rgba(${colorValues} 0.${999 - fs * 3})`
+                            }
+                        }
+                    } else return ''
+                }).filter(item =>{
+                    return item !== '';
+                })
+
+            }
+
             this.setState({...tempVal})
             if (healthChange && healthChange !== 0) {
                 this.props.updateHealth(healthChange)
@@ -139,7 +180,6 @@ class Tortoise extends Component {
     }
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.gameState === 'start' && this.props.gameState === 'game') {
-            console.log(this.props.left, this.props.top)
             this.setState({
                 rotation: 0,
                 left: this.props.scrWidth / 2 + 'px', 
@@ -158,18 +198,33 @@ class Tortoise extends Component {
     }
 
     render() { 
-        let stars = this.state.starsArr.map((item, i) => {
-            return (
-                <div className={styles.star} key={i}
-                    style={{
-                        left: item.left,
-                        top: item.top,
-                        backgroundColor: consts.starColors[item.bgColor],
-                    }}>
-                    
-                </div>
-            )
-        })
+        let stars = this.state.starsArr.map((item, i) => 
+            <div className={styles.star} key={i}
+                style={{
+                    left: item.left,
+                    top: item.top,
+                    backgroundColor: consts.starColors[item.bgColor]
+                }}>
+            </div>
+        )
+        // let obstacles = this.state.obstaclesArr.map((item,i) =>
+        //     <div className={styles.obstacle} key={i}
+        //         style={{
+        //             left: item.left,
+        //             top: item.top,
+        //             height: item.height
+        //         }}>
+        //     </div>
+        // )
+                        // { obstacles }
+        let pointsAnimated = '';
+        if (this.state.pointsAnimated) {
+            pointsAnimated = this.state.pointsAnimated.map((item,i) => {
+                console.log(item)
+                return <div className={styles.pointsAnimated} key={i} style={item.style}>{item.score}</div> 
+            })
+        }
+
         return ( 
             <div>
                 { stars }
@@ -191,6 +246,7 @@ class Tortoise extends Component {
                     <div className={styles.rear} style={{transform: this.state.rearRightTransform}}></div>
                     <div className={[styles.rear, styles.left].join(' ')} style={{transform: this.state.rearLeftTransform}}></div>
                 </div>
+                { pointsAnimated }
             </div>
          );
     }

@@ -56,8 +56,8 @@ let checkCollisions = (s1, x1, y1, star) => {
 
 let placeStar = (i, that) => {
     let tortoise = that;
-    let x = Math.floor(Math.random() * (tortoise.props.scrWidth - 60) + 30);
-    let y = Math.floor(Math.random() * (tortoise.props.scrHeight - 60) + 30);
+    let x = Math.floor(Math.random() * (tortoise.props.scrWidth - 80) + 40);
+    let y = Math.floor(Math.random() * (tortoise.props.scrHeight - 80) + 40);
     tortoise.setState(state => {
         let stars = state.starsArr.map(item => item);
         stars[i] = {
@@ -66,7 +66,7 @@ let placeStar = (i, that) => {
             vSpeed: Math.random() * 4 - 2,
             left: x + 'px',
             top: y + 'px',
-            bgColor: getRandomNumBetween(0, consts.starColors.length),
+            bgColor: getRandomNumBetween(0, consts.starColors.length)
         };
         return {starsArr: stars};
     })
@@ -74,13 +74,12 @@ let placeStar = (i, that) => {
     tortoise.starInterval[i] = window.setInterval(moveStar.bind(null, i, tortoise), tortoise.props.frameLength);
 }
 
-
 let moveStar = (i, that) => {
     let tortoise = that
     let star = tortoise.state.starsArr[i];
     let left = parseFloat(star.left);
     let top = parseFloat(star.top);
-    let transform = parseInt(star.transform) + star.rotationVelocity;
+    // let transform = parseInt(star.transform) + star.rotationVelocity;
     let hSpeed = star.hSpeed;
     let vSpeed = star.vSpeed;
     if (left + star.hSpeed <= 0) {
@@ -104,7 +103,7 @@ let moveStar = (i, that) => {
                     top: (top + vSpeed) + 'px',
                     vSpeed: vSpeed,
                     hSpeed: hSpeed,
-                    transform: transform
+                    // transform: transform
                 }
             } else { return item }
         })
@@ -171,8 +170,35 @@ let getRandomNumBetween = (min, max) => {
     return Math.floor(Math.random() * max - min) + min;
 }
 
+const halfHeight = parseInt(window.innerHeight / 2);
+const halfWidth = parseInt(window.innerWidth / 2);
+
+let createObstacles = (arr, topBarHeight, halfWidth, halfHeight) => {
+    return arr.map(item => {
+        console.log(getRandomNumBetween(topBarHeight, halfHeight / 2))
+        return {
+            top: getRandomNumBetween(topBarHeight, halfHeight / 2) + item.t,
+            left: getRandomNumBetween(halfWidth / 2, 3 * halfWidth / 2) + item.l,
+            height: halfHeight / 4 // 2 - item.t
+        };
+    })
+}
+
 const consts = {
     starColors: ['#EF5757', '#e67474', '#DE9079', '#C5DE79', '#C0DA74', '#ADC668', '#9AB15D', '#869D51', '#738846', '#60743A'], //  '#263717'   ////  , '#4D602E' , '#3A4B23', '#354e1f'
+    obstaclesAddressesArray: [{
+        t: 0,
+        l: 0
+    }, {
+        t: halfHeight /2,
+        l: 0
+    }, {
+        t: 0,
+        l: halfWidth / 2
+    }, {
+        t: halfHeight /2,
+        l: halfWidth /2
+    }],
     maxStarsCount: 3,
     bounceFactor: -0.33,
     maxVelocity: 0.35,
@@ -191,5 +217,6 @@ export {
     calculateVelocityAndRotation,
     flapsMoving,
     getRandomNumBetween,
+    createObstacles,
     consts
 }

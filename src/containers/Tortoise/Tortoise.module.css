@@ -71,3 +71,12 @@
     height: 25px;
     border-radius: 50%;
 }
+.obstacle {
+    position: fixed;
+    width: 6px;
+    background-color: red;
+}
+.pointsAnimated {
+    position: fixed;
+    font-weight: bold;
+}
