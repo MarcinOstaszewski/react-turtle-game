@@ -2,19 +2,25 @@ import React, { Component } from 'react';
 import './App.css';
 import Scene from './containers/Scene/Scene';
 import Tortoise from './containers/Tortoise/Tortoise';
-
+import { arr } from './helperFunctions';
 class App extends Component {
 
   state = {
     windowInnerWidth: window.innerWidth,
     windowInnerHeight: window.innerHeight,
-    rotation: 0,
-    keysPressed: {},
-    score: 0,
-    health: 100,
     gameState: 'start'
   }
   frameLength = 16;
+
+  resetThisState = () => {
+    this.setState({
+      rotation: 0,
+      keysPressed: {},
+      score: 0,
+      health: 100,
+      maxObstaclesNum: arr.length,
+    })
+  }
 
   checkWindowSize = () => {
     this.setState({
@@ -24,13 +30,19 @@ class App extends Component {
   }
 
   addToScore = (add) => {
-    this.setState({ score: this.state.score + add })
+    let obstaclesVisible = Math.floor((this.state.score + add) / 50);
+    if (obstaclesVisible > 13) obstaclesVisible = 13;
+    console.log(this.state.score + add, obstaclesVisible)
+    this.setState({ 
+      score: this.state.score + add,
+      maxObstaclesNum: obstaclesVisible
+    })
   }
 
   updateHealth = (change) => {
     if (this.state.health - change >= 100) {
       this.setState({
-        health: 100
+        health: 100,
       })
     } else if (this.state.health - change * 2 > 0) {
       this.setState({
@@ -51,6 +63,7 @@ class App extends Component {
         keysPressed: {},
         score: 0,
         health: 100,
+        maxObstaclesNum: 0,
       })
     }
     if (text === 'over') { localStorage['hiscore'] = Math.max(this.state.score, localStorage['hiscore']) }
@@ -58,6 +71,7 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this.resetThisState();
     document.onkeyup = (e) => {
       const keys = {...this.state.keysPressed};
       delete keys[e.key];
@@ -92,6 +106,7 @@ class App extends Component {
           addToScore={this.addToScore}
           updateHealth={this.updateHealth}
           health={this.state.health}
+          maxObstaclesNum={this.state.maxObstaclesNum}
           gameState={this.state.gameState}
         />
       </div>
