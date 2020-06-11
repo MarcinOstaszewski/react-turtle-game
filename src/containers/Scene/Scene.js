@@ -6,10 +6,9 @@ import Start from '../../components/Start/Start';
 import GameOver from '../../components/GameOver/GameOver';
 
 const scene = (props) => {
-
     let healthBarStyle = {
-        width: (props.width * props.health / 200 ) + 'px',
-        left: (props.width / 2 - (props.width * props.health / 400)) + 'px',
+        width: (props.width * props.health / 200 ),
+        left: (props.width / 2 - (props.width * props.health / 400)),
         backgroundColor: `hsl(${props.health}, 70%, 35%)`
     }
     let displayScore;
@@ -25,13 +24,12 @@ const scene = (props) => {
         displayScore = <div className={styles.score}>Score: <span id="score">{props.score}</span></div>
 
     } else if (props.gameState === 'over') {
-
         legend = <GameOver 
             score={props.score}
             changeGameState={props.changeGameState}/>
     }
 
-    return ( 
+    return (
         <div>
             <div id={styles.scene} style={props}></div>
             <div id={styles.topBar} ></div>
@@ -40,7 +38,6 @@ const scene = (props) => {
             { legend }
         </div> 
     );
-
 }
  
 export default scene;
