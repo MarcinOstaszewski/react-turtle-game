@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/react-turtle-game/static/css/main.cda3a048.chunk.css",
-    "main.js": "/react-turtle-game/static/js/main.275a7162.chunk.js",
-    "main.js.map": "/react-turtle-game/static/js/main.275a7162.chunk.js.map",
+    "main.css": "/react-turtle-game/static/css/main.16922f10.chunk.css",
+    "main.js": "/react-turtle-game/static/js/main.17a5e4c7.chunk.js",
+    "main.js.map": "/react-turtle-game/static/js/main.17a5e4c7.chunk.js.map",
     "runtime-main.js": "/react-turtle-game/static/js/runtime-main.a2f9544a.js",
     "runtime-main.js.map": "/react-turtle-game/static/js/runtime-main.a2f9544a.js.map",
     "static/js/2.18cf66ea.chunk.js": "/react-turtle-game/static/js/2.18cf66ea.chunk.js",
     "static/js/2.18cf66ea.chunk.js.map": "/react-turtle-game/static/js/2.18cf66ea.chunk.js.map",
     "index.html": "/react-turtle-game/index.html",
-    "precache-manifest.0f4a5ccc0c88fb0e7c64be12b4a2f323.js": "/react-turtle-game/precache-manifest.0f4a5ccc0c88fb0e7c64be12b4a2f323.js",
+    "precache-manifest.3553bede919a6f945513eb7882b98ae0.js": "/react-turtle-game/precache-manifest.3553bede919a6f945513eb7882b98ae0.js",
     "service-worker.js": "/react-turtle-game/service-worker.js",
-    "static/css/main.cda3a048.chunk.css.map": "/react-turtle-game/static/css/main.cda3a048.chunk.css.map",
+    "static/css/main.16922f10.chunk.css.map": "/react-turtle-game/static/css/main.16922f10.chunk.css.map",
     "static/js/2.18cf66ea.chunk.js.LICENSE.txt": "/react-turtle-game/static/js/2.18cf66ea.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.a2f9544a.js",
     "static/js/2.18cf66ea.chunk.js",
-    "static/css/main.cda3a048.chunk.css",
-    "static/js/main.275a7162.chunk.js"
+    "static/css/main.16922f10.chunk.css",
+    "static/js/main.17a5e4c7.chunk.js"
   ]
 }

@@ -1,11 +1,11 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "9b6aa0b164d7d8f4a1b8a74ae0f59f5f",
+    "revision": "89860268ceff8bdc871d81051b882c4e",
     "url": "/react-turtle-game/index.html"
   },
   {
-    "revision": "191ecffc32f9427c9fbd",
-    "url": "/react-turtle-game/static/css/main.cda3a048.chunk.css"
+    "revision": "23a1107d60a9bdc72ee8",
+    "url": "/react-turtle-game/static/css/main.16922f10.chunk.css"
   },
   {
     "revision": "90171486679cc17a322c",
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/react-turtle-game/static/js/2.18cf66ea.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "191ecffc32f9427c9fbd",
-    "url": "/react-turtle-game/static/js/main.275a7162.chunk.js"
+    "revision": "23a1107d60a9bdc72ee8",
+    "url": "/react-turtle-game/static/js/main.17a5e4c7.chunk.js"
   },
   {
     "revision": "a99d87cc6e222717480d",
