@@ -1,22 +1,24 @@
 import React, { Component } from 'react';
-import styles from './Tortoise.module.css'
+import styles from './Tortoise.module.css';
 import {
     setPlayerPosition,
     setPlayerRotation,
     verifyBounce,
-    checkCollisions,
+    checkObjectsCollisions,
+    checkVerticalCollisions,
     placeStar,
     calculateVelocityAndRotation,
     flapsMoving,
-    // createObstacles,
+    createObstacles,
+    countAnimatedPoints,
+    setObstaclesPositions,
     consts
 } from '../../helperFunctions';
 
 class Tortoise extends Component {
     state = {
         starsArr: [],
-        obstaclesArr: [], 
-        // createObstacles(consts.obstaclesAddressesArray, consts.topBarHeight, this.props.scrWidth, this.props.scrHeight),
+        obstaclesArr: createObstacles(consts.obstaclesAddressesArray, consts.topBarHeight, this.props.scrWidth, this.props.scrHeight),
         leftFlap: {
             transform: '',
         },
@@ -27,14 +29,15 @@ class Tortoise extends Component {
         rotationVelocity: 0,
     }
     starInterval = [];
+
     tmOut;
 
     resetThisState = () => {
         this.setState({
             rearRightTransform: '',
             rearLeftTransform: '',
-            left: this.props.scrWidth / 2 + 'px', // tortoise horiz. position
-            top: this.props.scrHeight / 2 + 'px', // tortoise vert. position
+            left: this.props.scrWidth / 2, // tortoise horiz. position
+            top: this.props.scrHeight / 2, // tortoise vert. position
             rotation: 0,
             horizontalVelocity: 0,
             verticalVelocity: 0,
@@ -56,6 +59,7 @@ class Tortoise extends Component {
             },
             head: '-10px',
             rotationVelocity: 0, 
+            healthChange: 0
         })
     }
 
@@ -66,13 +70,14 @@ class Tortoise extends Component {
                 rightFlap: {...this.state.rightFlap},
                 rearLeftTransform: "rotate(-20deg)", // starting position
                 rearRightTransform: "rotate(20deg)",
-                top: parseFloat(this.state.top),
-                left: parseFloat(this.state.left),
+                top: this.state.top,
+                left: this.state.left,
                 rotation: this.state.rotation + 0,
                 rotationVelocity: this.state.rotationVelocity,
                 head: '-10px',
                 health: this.state.health,
                 pointsAnimated: this.state.pointsAnimated,
+                healthChange: 0
             }
 
             Object.assign(tempVal.leftFlap, flapsMoving(tempVal.leftFlap, this.props.keysPressed)) // overwrite in tempVal variables for flap(s)
@@ -93,39 +98,19 @@ class Tortoise extends Component {
 
             for (let i = 0; i < this.state.starsArr.length; i++) {
                 let star = this.state.starsArr[i];
-                if (checkCollisions(
+                if (checkObjectsCollisions(
                     consts.tortoiseSize, tempVal.left, tempVal.top,  // tortoise
                     star // star
                 )) {
-                    let healedPoints = 0;
-                    let score = parseInt(Math.abs(tempVal.horizontalVelocity) + Math.abs(tempVal.verticalVelocity) + Math.abs(star.hSpeed) + Math.abs(star.vSpeed)) + (consts.starColors.length - star.bgColor);
-                    if (star.bgColor < 3) {
-                        if (tempVal.health < 100) {
-                            healedPoints = 4 * star.bgColor - 12
-                            tempVal.health -= healedPoints; // heals 
-                            score = 0;
-                        } else {
-                            this.props.addToScore(score * 2); // OR multiples score when 100% healthy
-                        }
-                    } else {
-                        this.props.addToScore(score); // OR just scores
-                    }
-
-                    tempVal.pointsAnimated = [
-                        ...tempVal.pointsAnimated,
-                        {
-                            score: score,
-                            heal: healedPoints,
-                            style: {
-                                left: `${parseInt(star.left.slice(0, -2))}px`,
-                                top: `${parseInt(star.top.slice(0, -2))}px`,
-                                fontSize: 60 + 'px',
-                            }
-                        }
-                    ]
-
+                    tempVal.pointsAnimated = countAnimatedPoints(tempVal, star, consts.starColors, this.props.addToScore)
                     window.clearInterval(this.starInterval[i]);
-                    placeStar(i, this)
+                    placeStar(i, this, consts.tortoiseSize)
+                }
+            }
+
+            for (let i = 0; i < this.props.maxObstaclesNum; i++) { // state.obstaclesArr.length
+                if (checkVerticalCollisions(consts.tortoiseSize, tempVal.left, tempVal.top, this.state.obstaclesArr[i])) {
+                    tempVal.health -= 1;
                 }
             }
 
@@ -146,8 +131,7 @@ class Tortoise extends Component {
 
             if (tempVal.pointsAnimated) {
                 tempVal.pointsAnimated = tempVal.pointsAnimated.map( item => {
-                    let fs = parseInt(item.style.fontSize);
-                    console.log(item.heal, item.score)
+                    let fs = item.style.fontSize;
                     let colorValues = '36, 91, 150,'
                     if (item.heal) { colorValues = '68, 152, 27,' }
                     if (fs < 300) {
@@ -155,41 +139,38 @@ class Tortoise extends Component {
                             ...item,
                             style: {
                                 ...item.style,
-                                fontSize: (fs + 2) + 'px',
+                                fontSize: (fs + 2),
                                 color: `rgba(${colorValues} 0.${999 - fs * 3})`
                             }
                         }
                     } else return ''
-                }).filter(item =>{
-                    return item !== '';
-                })
-
+                }).filter(item => item !== '')
             }
 
-            this.setState({...tempVal})
             if (healthChange && healthChange !== 0) {
+                tempVal.healthChange = healthChange;
                 this.props.updateHealth(healthChange)
             }
+            this.setState({...tempVal})
         }
     }
 
     componentDidMount() {
         this.resetThisState();
-        window.onresize = () => this.props.checkWindowSize();
+        window.onresize = () => {
+            this.props.checkWindowSize();
+            consts.obstaclesAddressesArray = setObstaclesPositions();
+            this.setState({obstaclesArr: createObstacles(consts.obstaclesAddressesArray, consts.topBarHeight, this.props.scrWidth, this.props.scrHeight)})
+        }
         this.interval = window.setInterval(this.update, this.props.frameLength);
     }
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.gameState === 'start' && this.props.gameState === 'game') {
-            this.setState({
-                rotation: 0,
-                left: this.props.scrWidth / 2 + 'px', 
-                top: this.props.scrHeight / 2 + 'px',
-                horizontalVelocity: 0,
-                verticalVelocity: 0,
-            })
+            console.log('ze start na game')
+            this.resetThisState();
         }
         if (this.state.starsArr.length < consts.maxStarsCount) {
-            placeStar(this.state.starsArr.length, this);
+            placeStar(this.state.starsArr.length, this, consts.tortoiseSize);
         }
     }
     componentWillUnmount() {
@@ -198,6 +179,18 @@ class Tortoise extends Component {
     }
 
     render() { 
+        let healthChangeIndicator;
+        if (this.state.healthChange !== 0 && this.state.top) {
+            let bgColor = this.state.healthChange > 0 ? '#e338' : '#3f38';
+            healthChangeIndicator = <div id={styles.healthIndicator}
+                style={{
+                    backgroundColor: bgColor,
+                    top: this.state.top - consts.tortoiseSize,
+                    left: this.state.left - consts.tortoiseSize
+                }}
+            />
+        }
+
         let stars = this.state.starsArr.map((item, i) => 
             <div className={styles.star} key={i}
                 style={{
@@ -207,32 +200,35 @@ class Tortoise extends Component {
                 }}>
             </div>
         )
-        // let obstacles = this.state.obstaclesArr.map((item,i) =>
-        //     <div className={styles.obstacle} key={i}
-        //         style={{
-        //             left: item.left,
-        //             top: item.top,
-        //             height: item.height
-        //         }}>
-        //     </div>
-        // )
-                        // { obstacles }
+        let obstacles = [];
+        for (let i = 0; i < this.props.maxObstaclesNum; i++) {
+            let item = this.state.obstaclesArr[i];
+            obstacles.push(
+                <div className={styles.obstacle} key={i}
+                style={{
+                    left: item.left,
+                    top: item.top,
+                    height: item.height
+                }}/>
+            )
+        } 
         let pointsAnimated = '';
         if (this.state.pointsAnimated) {
             pointsAnimated = this.state.pointsAnimated.map((item,i) => {
-                console.log(item)
-                return <div className={styles.pointsAnimated} key={i} style={item.style}>{item.score}</div> 
+                let bonus = item.bonusScore === 0 ? '' : `+${item.bonusScore}`
+                return <div className={styles.pointsAnimated} key={i} style={item.style}>{item.score}{bonus}</div> 
             })
         }
 
         return ( 
             <div>
                 { stars }
+                { healthChangeIndicator }
                 <div id={styles.Tortoise} 
                     style = {{
                         left: this.state.left,
                         top: this.state.top,
-                        transform: `rotate(${this.state.rotation}deg)`
+                        transform: `translate(-50%, -50%) rotate(${this.state.rotation}deg)`
                 }}>
                     <div className={styles.head} 
                         style={{top: this.state.head}}>
@@ -246,10 +242,11 @@ class Tortoise extends Component {
                     <div className={styles.rear} style={{transform: this.state.rearRightTransform}}></div>
                     <div className={[styles.rear, styles.left].join(' ')} style={{transform: this.state.rearLeftTransform}}></div>
                 </div>
+                { obstacles }
                 { pointsAnimated }
             </div>
          );
+        }
     }
-}
- 
+
 export default Tortoise;
