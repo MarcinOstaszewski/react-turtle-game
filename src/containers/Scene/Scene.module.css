@@ -1,5 +1,5 @@
 #scene {
-    border: 1px solid #76078a;
+    border: 2px solid #76078a;
     box-sizing: border-box;
 }
 #healthbar {
@@ -14,7 +14,7 @@
     height: 40px;
     width: 100%;
     background-color: #222;
-    border-bottom: 1px solid #76078a;
+    border-bottom: 2px solid #76078a;
 }
 .score {
     position: fixed;
