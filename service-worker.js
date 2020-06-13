@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/react-turtle-game/precache-manifest.3553bede919a6f945513eb7882b98ae0.js"
+  "/react-turtle-game/precache-manifest.8d2e5ea737900b3115f26b81d83fc50c.js"
 );
 
 self.addEventListener('message', (event) => {
