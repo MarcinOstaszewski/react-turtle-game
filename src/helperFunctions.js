@@ -189,10 +189,10 @@ let createObstacles = (arr) => {
 }
 let countAnimatedPoints = (tempVal, star, starColors, addToScore ) => {
     let bonusScore = 0;
-    if (tempVal.pointsAnimated.length) {
+    if (tempVal.pointsAnimated.length) { // if animated points visible...
         let arr = [];
         tempVal.pointsAnimated.forEach(item=> arr.push(item.score))
-        bonusScore = arr.reduce((total, score) => total + score, 0)
+        bonusScore = arr.reduce((total, score) => total + score, 0)// ...adds them as bonus points
     }
     let healedPoints = 0;
     let score = parseInt(Math.abs(tempVal.horizontalVelocity) + Math.abs(tempVal.verticalVelocity) + Math.abs(star.hSpeed) + Math.abs(star.vSpeed)) + (starColors.length - star.bgColor) + bonusScore;
@@ -202,15 +202,15 @@ let countAnimatedPoints = (tempVal, star, starColors, addToScore ) => {
             tempVal.health -= healedPoints; // heals 
             score = 0;
         } else {
-            addToScore(score * 2); // OR multiples score when 100% healthy
+            score *= 2 // OR multiples score when 100% healthy
+            addToScore(score); 
         }
     } else {
         addToScore(score); // OR just scores
     }
-    
-    return [
-        ...tempVal.pointsAnimated,
-        {
+    let arrayOfPoints = [...tempVal.pointsAnimated]
+    if (score > 0) {
+        arrayOfPoints.push({
             score: score,
             bonusScore: bonusScore,
             heal: healedPoints,
@@ -219,15 +219,16 @@ let countAnimatedPoints = (tempVal, star, starColors, addToScore ) => {
                 top: star.top,
                 fontSize: 60,
             }
-        }
-    ]
+        })
+    }
+    return arrayOfPoints;
 }
 
-let setObstaclesPositions = (arr) => {
+let setObstaclesPositions = (obstaclesInfo) => {
     let scrWidth = window.innerWidth;
     let scrHeight = window.innerHeight;
     
-    let ret = arr.map( a => ({
+    let ret = obstaclesInfo.map( a => ({
         'l': scrWidth / a[0] * a[1],
         't': scrHeight / a[2] * a[3], 
         'h': scrHeight / a[4], 
@@ -235,12 +236,12 @@ let setObstaclesPositions = (arr) => {
     return ret
 }
 
-const arr = [[4,1,4,1,4],[6,4,6,1,6],[5,4,4,3,6],[2,1,3,2,8],[9,8,3,1,6],[5,1,12,8,5],[12,1,8,1,7]
-    ,[14,5,4,3,5],[9,7,6,1,4],[2,1,29,3,5],[3,2,9,5,4],[23,2,23,15,3],[48,20,5,1,5]]
+const obstaclesInfo = [[4,1,4,1,4],[6,4,6,1,6],[5,4,4,3,6],[2,1,3,2,8],[9,8,3,1,6],[5,1,12,8,5],[12,1,8,1,7]
+    ,[14,5,4,3,5],[9,7,6,1,4],[2,1,29,3,5],[3,2,9,5,4],[23,2,23,15,3],[48,17,5,1,5]]
 
 const consts = {
     starColors: ['#EF5757', '#e67474', '#DE9079', '#C5DE79', '#C0DA74', '#ADC668', '#9AB15D', '#869D51', '#738846', '#60743A'], //  '#263717'   ////  , '#4D602E' , '#3A4B23', '#354e1f'
-    obstaclesAddressesArray: setObstaclesPositions(arr),
+    obstaclesAddressesArray: setObstaclesPositions(obstaclesInfo),
     maxStarsCount: 3,
     bounceFactor: -0.33,
     maxVelocity: 0.35,
@@ -263,6 +264,6 @@ export {
     createObstacles,
     countAnimatedPoints,
     setObstaclesPositions,
-    arr,
+    obstaclesInfo,
     consts
 }
