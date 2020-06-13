@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styles from './Tortoise.module.css';
+
 import {
     setPlayerPosition,
     setPlayerRotation,
@@ -12,6 +13,7 @@ import {
     createObstacles,
     countAnimatedPoints,
     setObstaclesPositions,
+    obstaclesInfo,
     consts
 } from '../../helperFunctions';
 
@@ -159,14 +161,13 @@ class Tortoise extends Component {
         this.resetThisState();
         window.onresize = () => {
             this.props.checkWindowSize();
-            consts.obstaclesAddressesArray = setObstaclesPositions();
+            consts.obstaclesAddressesArray = setObstaclesPositions(obstaclesInfo);
             this.setState({obstaclesArr: createObstacles(consts.obstaclesAddressesArray, consts.topBarHeight, this.props.scrWidth, this.props.scrHeight)})
         }
         this.interval = window.setInterval(this.update, this.props.frameLength);
     }
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.gameState === 'start' && this.props.gameState === 'game') {
-            console.log('ze start na game')
             this.resetThisState();
         }
         if (this.state.starsArr.length < consts.maxStarsCount) {
