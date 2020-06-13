@@ -82,11 +82,11 @@
 @keyframes flickering {
     0% {
         width: 4px;
-        background-color: rgb(182, 7, 7);
+        background-color: rgba(199, 5, 5, 0.65);
     }
     100% {
         width: 3px;
-        background-color: rgb(150, 3, 3);
+        background-color: rgba(180, 7, 7, 0.65);
     }
 }
 .obstacle {
