@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import './App.css';
 import Scene from './containers/Scene/Scene';
 import Tortoise from './containers/Tortoise/Tortoise';
-import { arr } from './helperFunctions';
+import { obstaclesInfo } from './helperFunctions';
+import { sounds } from '../src/assetsImports';
+
 class App extends Component {
 
   state = {
@@ -11,14 +13,14 @@ class App extends Component {
     gameState: 'start'
   }
   frameLength = 16;
-
+  
   resetThisState = () => {
     this.setState({
       rotation: 0,
       keysPressed: {},
       score: 0,
       health: 100,
-      maxObstaclesNum: arr.length,
+      maxObstaclesNum: obstaclesInfo.length,
     })
   }
 
@@ -30,9 +32,10 @@ class App extends Component {
   }
 
   addToScore = (add) => {
+    console.log(add)
+    sounds.collectSound.play()
     let obstaclesVisible = Math.floor((this.state.score + add) / 50);
     if (obstaclesVisible > 13) obstaclesVisible = 13;
-    console.log(this.state.score + add, obstaclesVisible)
     this.setState({ 
       score: this.state.score + add,
       maxObstaclesNum: obstaclesVisible
@@ -45,6 +48,17 @@ class App extends Component {
         health: 100,
       })
     } else if (this.state.health - change * 2 > 0) {
+      if (change < 0) {
+        sounds.healSound.play() 
+      } else {
+        if (change > 3) {
+          sounds.hit03Sound.play();
+        } else if (change > 2) {
+          sounds.hit02Sound.play();
+        } else {
+          sounds.hit01Sound.play();
+        }
+      }
       this.setState({
         health: this.state.health - change * 2,
       })
@@ -84,6 +98,7 @@ class App extends Component {
       }
       this.setState({ keysPressed: keys })
     }
+    sounds.bgmusic.play();
   }
 
   render() {
