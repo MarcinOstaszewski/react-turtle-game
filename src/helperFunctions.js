@@ -36,37 +36,35 @@ let verifyBounce = (tempVal, consts, props) => {
     return values;
 }
 
-let checkObjectsCollisions = (s1, x1, y1, star) => {
-    let s2 = star.size;
-    let x2 = star.left;
-    let y2 = star.top;
-    let dx = x1 - x2;
-    let dy = y1 - y2;
+let checkObjectsCollisions = (tSize, tLeft, tTop, star) => {
+    let { size, left, top } = star;
+    let dx = tLeft - left;
+    let dy = tTop - top;
     let dist = Math.sqrt(dx * dx + dy * dy);
-    return dist < (s1 + s2) * 0.7 ? true : false;
+    return dist < (tSize + size) * 0.7 ? true : false;
 }
 
 let checkVerticalCollisions = (size, left, top, obst) => {
     if (top - size / 2 > obst.top && top + size / 2 < obst.top + obst.height) { // is between the top and bottom of obstacle?
-        if ( obst.left > left - size / 2 && obst.left < left + size / 2 ) { // is "touchin" an obstacle?
-            return true
+        if ( obst.left > left - size / 2 && obst.left < left + size / 2 ) { // is "touching" an obstacle?
+            return true;
         }
-    } else return false
+    } else return false;
 }
 
 let getRandomNumBetweenExcluding = (min1, max1, min2, max2) => {
-    return getRandomNumBetween(1, 2) === 1 ? getRandomNumBetween(min1, max1) : getRandomNumBetween(min2, max2)
+    return getRandomNumBetween(1, 2) === 1 ? getRandomNumBetween(min1, max1) : getRandomNumBetween(min2, max2);
 }
 
 let placeStar = (i, that, size) => {
     let tortoise = that;
     let tmpLeft = tortoise.left || tortoise.props.scrWidth / 2;
     let tmpTop = tortoise.top || tortoise.props.scrHeight / 2;
-    if (tmpLeft < size || tmpLeft > tortoise.props.scrWidth - size) tmpLeft = tortoise.props.scrWidth / 2
-    if (tmpTop < size || tmpTop > tortoise.props.scrHeight - size) tmpTop = tortoise.props.scrHeight / 2
+    if (tmpLeft < size || tmpLeft > tortoise.props.scrWidth - size) tmpLeft = tortoise.props.scrWidth / 2;
+    if (tmpTop < size || tmpTop > tortoise.props.scrHeight - size) tmpTop = tortoise.props.scrHeight / 2;
     let x = getRandomNumBetweenExcluding(size * 2, tmpLeft - size * 2, 
-        tmpLeft + size * 2, tortoise.props.scrWidth - size * 2);
-    let y = getRandomNumBetweenExcluding(size * 2 + consts.topBarHeight, tmpTop - size * 2,
+        tmpLeft + size * 2, tortoise.props.scrWidth - size * 2),
+        y = getRandomNumBetweenExcluding(size * 2 + consts.topBarHeight, tmpTop - size * 2,
         tmpTop + size * 2, tortoise.props.scrHeight - size * 2);
     tortoise.setState(state => {
         let stars = state.starsArr.map(item => item);
@@ -121,7 +119,7 @@ let moveStar = (i, that) => {
 }
 
 let calculateVelocityAndRotation = (obj, maxRotation) => {
-    let values = Object.assign({}, {...obj})
+    let values = {...obj};
     if (Math.abs(values.verticalVelocity) > 0.01) {
         values.verticalVelocity = values.verticalVelocity * 0.97; // gradually slows down speed
     } else {

@@ -32,8 +32,7 @@ class App extends Component {
   }
 
   addToScore = (add) => {
-    console.log(add)
-    sounds.collectSound.play()
+    sounds.collectSound.play();
     let obstaclesVisible = Math.floor((this.state.score + add) / 50);
     if (obstaclesVisible > 13) obstaclesVisible = 13;
     this.setState({ 
@@ -49,7 +48,7 @@ class App extends Component {
       })
     } else if (this.state.health - change * 2 > 0) {
       if (change < 0) {
-        sounds.healSound.play() 
+        sounds.healSound.play();
       } else {
         if (change > 3) {
           sounds.hit03Sound.play();
@@ -63,7 +62,7 @@ class App extends Component {
         health: this.state.health - change * 2,
       })
     } else {
-      this.changeGameState('over')
+      this.changeGameState('over');
     }
   }
 
@@ -81,7 +80,7 @@ class App extends Component {
       })
     }
     if (text === 'over') { localStorage['hiscore'] = Math.max(this.state.score, localStorage['hiscore']) }
-    this.setState({ ...newState })
+    this.setState({ ...newState });
   }
 
   componentDidMount() {
@@ -98,7 +97,7 @@ class App extends Component {
       }
       this.setState({ keysPressed: keys })
     }
-    sounds.bgmusic.play();
+    // sounds.bgmusic.play();
   }
 
   render() {

@@ -14,7 +14,7 @@ const Start = (props) => {
             <div className={styles.btn}
                 onClick={ () => props.changeGameState('game') }
             >START</div>
-            <div class={styles.sounds}>
+            <div className={styles.sounds}>
                 <p>Music: </p>
                 <p>"Covered In Oil" by Broke For Free @freemusicarchive.org</p>
                 <p>Sounds:</p>
